@@ -76,7 +76,7 @@ class Profile extends React.Component {
     }
 
     back() {
-        this.props.history.push("/game/Front");
+        this.props.history.push("/game/front");
     }
 
     render() {
