@@ -1,94 +1,84 @@
 import React from "react";
+import {Button} from "../../views/design/Button";
+import {BaseContainer} from "../../helpers/layout";
+import {withRouter} from "react-router-dom";
 import styled from "styled-components";
-import { BaseContainer } from "../../helpers/layout";
-import { getDomain } from "../../helpers/getDomain";
-import Player from "../../views/Player";
-import { Spinner } from "../../views/design/Spinner";
-import { Button } from "../../views/design/Button";
-import { withRouter } from "react-router-dom";
+import {getDomain} from "../../helpers/getDomain";
 
 const Container = styled(BaseContainer)`
-  color: white;
-  text-align: center;
+  width: 200px;
 `;
 
-const Users = styled.ul`
-  list-style: none;
-  padding-left: 0;
-`;
-
-const PlayerContainer = styled.li`
+const ButtonContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
+  margin-top: 10px;
+`;
+
+const OptionsButton = styled(Button)`
+  background: rgb(127, 124, 186);
 `;
 
 class Game extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      users: null
+      id: localStorage.getItem("myId"),
+      token: localStorage.getItem("token")
     };
   }
 
-  logout() {
-    localStorage.removeItem("token");
-    this.props.history.push("/login");
+  componentDidMount() {
+    this.props.history.push("/game/front");
   }
 
-  componentDidMount() {
-    fetch(`${getDomain()}/users`, {
-      method: "GET",
+  logout() {
+    fetch(`${getDomain()}/logout`, {
+      method: "PUT",
       headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(response => response.json())
-      .then(async users => {
-        // delays continuous execution of an async operation for 0.8 seconds.
-        // This is just a fake async call, so that the spinner can be displayed
-        // feel free to remove it :)
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        this.setState({ users });
+        "Content-Type": "application/json",
+        "Token": this.state.token
+      },
+      body: JSON.stringify({
+        id: this.state.id
       })
-      .catch(err => {
-        console.log(err);
-        alert("Something went wrong fetching the users: " + err);
-      });
+    })
+        .then(response => response.json())
+        .then(returnedUser => {
+
+          if (returnedUser.status !== "OFFLINE") {
+            alert(returnedUser.message);
+          }
+          localStorage.removeItem("token");
+          localStorage.removeItem("myId");
+          this.props.history.push("/login");
+
+        })
+        .catch(err => {
+          if (err.message.match(/Failed to fetch/)) {
+            alert("The server cannot be reached. Did you start it?");
+          } else {
+            alert(`Something went wrong during the logout: ${err.message}`);
+          }
+        });
   }
 
   render() {
     return (
-      <Container>
-        <h2>Happy Coding! </h2>
-        <p>Get all users from secure end point:</p>
-        {!this.state.users ? (
-          <Spinner />
-        ) : (
-          <div>
-            <Users>
-              {this.state.users.map(user => {
-                return (
-                  <PlayerContainer key={user.id}>
-                    <Player user={user} />
-                  </PlayerContainer>
-                );
-              })}
-            </Users>
-            <Button
-              width="100%"
-              onClick={() => {
-                this.logout();
-              }}
+        <Container>
+          <ButtonContainer>
+            <OptionsButton
+                width="110%"
+                onClick={() => {
+                  this.logout();
+                }}
             >
               Logout
-            </Button>
-          </div>
-        )}
-      </Container>
-    );
+            </OptionsButton>
+          </ButtonContainer>
+        </Container>
+
+    )
   }
 }
 

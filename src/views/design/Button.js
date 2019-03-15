@@ -18,4 +18,6 @@ export const Button = styled.button`
   opacity: ${props => (props.disabled ? 0.4 : 1)};
   background: rgb(16, 89, 255);
   transition: all 0.3s ease;
+  margin-left: 5px;
+  margin-right: 5px;
 `;

@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import { Redirect, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
+import Front from "../../game/Front";
+import Profile from "../../game/Profile";
+import Profileediting from "../../game/Profileediting";
 import Game from "../../game/Game";
 
 const Container = styled.div`
@@ -9,26 +12,38 @@ const Container = styled.div`
 `;
 
 class GameRouter extends React.Component {
-  render() {
-    /**
-     * "this.props.base" is "/app" because as been passed as a prop in the parent of GameRouter, i.e., App.js
-     */
-    return (
-      <Container>
-        <Route
-          exact
-          path={`${this.props.base}/dashboard`}
-          render={() => <Game />}
-        />
+    render() {
+        /**
+         * "this.props.base" is "/app" because as been passed as a prop in the parent of GameRouter, i.e., App.js
+         */
+        return (
+            <Container>
+                <Route
+                    exact
+                    path={`${this.props.base}/Front`}
+                    render={() => <Front />}
+                />
 
-        <Route
-          exact
-          path={`${this.props.base}`}
-          render={() => <Redirect to={`${this.props.base}/dashboard`} />}
-        />
-      </Container>
-    );
-  }
+                <Route
+                    path={`${this.props.base}`}
+                    render={() => <Game />}
+                />
+
+                <Route
+                    exact
+                    path={`${this.props.base}/profile/:profileId`}
+                    component = {Profile}
+                />
+
+                <Route
+                    exact
+                    path={`${this.props.base}/profile/:profileId/edit`}
+                    component = {Profileediting}
+                />
+
+            </Container>
+        );
+    }
 }
 /*
 * Don't forget to export your component!
